@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primary: #fea928;
+  --color-secondary: #ed8900;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-inline: 3rem;
+  }
+}
+
+@keyframes auth-success-enter {
+  from { opacity: 0; transform: translateY(16px) scale(.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes auth-check-circle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes auth-check-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes auth-progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes auth-error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.auth-success-card { animation: auth-success-enter .35s ease-out both; }
+.auth-success-icon { height: 88px; width: 88px; }
+.auth-success-icon svg { height: 100%; width: 100%; overflow: visible; }
+.auth-success-circle {
+  fill: #dcfce7;
+  stroke: #22c55e;
+  stroke-width: 4;
+  stroke-dasharray: 195;
+  stroke-dashoffset: 195;
+  animation: auth-check-circle .45s ease-out .1s forwards;
+}
+.auth-success-check {
+  stroke: #15803d;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 6;
+  stroke-dasharray: 52;
+  stroke-dashoffset: 52;
+  animation: auth-check-draw .35s ease-out .45s forwards;
+}
+.auth-success-progress { animation: auth-progress 3s linear forwards; }
+.auth-error-alert { animation: auth-error-shake .32s ease-in-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-success-card, .auth-success-circle, .auth-success-check, .auth-success-progress, .auth-error-alert { animation: none; }
+  .auth-success-circle, .auth-success-check { stroke-dashoffset: 0; }
+  .auth-success-progress { transform: translateX(0); }
+}

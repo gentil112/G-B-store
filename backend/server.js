@@ -7,6 +7,7 @@ require("dotenv").config({
 });
 
 const connectDB = require("./config/database");
+
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -25,9 +26,11 @@ const allowedOrigins = (
 const vercelOrigin = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
   : null;
+
 const vercelPreviewOrigin = process.env.VERCEL_BRANCH_URL
   ? `https://${process.env.VERCEL_BRANCH_URL}`
   : null;
+
 const vercelUrlOrigin = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : null;
@@ -56,7 +59,20 @@ app.use(
 
 app.use(express.json());
 
-connectDB();
+// Wait for MongoDB before handling API requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("Database connection error:", error);
+
+    res.status(500).json({
+      message: "Database connection failed",
+      error: error.message,
+    });
+  }
+});
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);

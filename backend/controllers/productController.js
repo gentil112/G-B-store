@@ -1,26 +1,46 @@
 const Product = require("../models/Product");
+const mongoose = require("mongoose");
+
+const isNumericValue = (value) =>
+  (typeof value === "number" || (typeof value === "string" && value.trim() !== "")) &&
+  Number.isFinite(Number(value));
+
+const validateProductInput = (body) => {
+  const { name, description, price, image, category, stock } = body || {};
+  if (
+    typeof name !== "string" || !name.trim() || name.trim().length > 120 ||
+    typeof description !== "string" || !description.trim() || description.length > 5000 ||
+    typeof image !== "string" || !image.trim() || image.length > 2048 ||
+    typeof category !== "string" || !category.trim() || category.trim().length > 80 ||
+    !isNumericValue(price) || Number(price) < 0 ||
+    (stock !== undefined && (!isNumericValue(stock) || !Number.isSafeInteger(Number(stock)) || Number(stock) < 0))
+  ) return null;
+
+  return {
+    name: name.trim(),
+    description: description.trim(),
+    price: Number(price),
+    image: image.trim(),
+    category: category.trim(),
+    stock: stock === undefined ? 0 : Number(stock),
+  };
+};
+
+const isValidProductId = (id) => mongoose.isValidObjectId(id);
 
 // Create a new product
 const createProduct = async (req, res) => {
   try {
-    const { name, description, price, image, category, stock } = req.body;
-
-    // Check required fields
-    if (!name || !description || price === undefined || !image || !category) {
+    const productData = validateProductInput(req.body);
+    if (!productData) {
       return res.status(400).json({
-        message: "Please provide all required product fields",
+        message: "Provide a name, description, image, category, non-negative price, and whole-number stock.",
       });
     }
 
     // Create product
-    const product = await Product.create({
-      name,
-      description,
-      price,
-      image,
-      category,
-      stock,
-    });
+    const product = await Product.create(productData);
+    console.info("Admin audit: product created", { adminId: req.user.id, productId: product.id });
 
     // Send created product back
     res.status(201).json({
@@ -73,7 +93,16 @@ const getProductById = async (req, res) => {
 };
 const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    if (!isValidProductId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid product ID." });
+    }
+    const productData = validateProductInput(req.body);
+    if (!productData) {
+      return res.status(400).json({
+        message: "Provide a name, description, image, category, non-negative price, and whole-number stock.",
+      });
+    }
+    const product = await Product.findByIdAndUpdate(req.params.id, productData, {
       new: true,
       runValidators: true,
     });
@@ -88,6 +117,7 @@ const updateProduct = async (req, res) => {
       message: "Product updated successfully",
       product,
     });
+    console.info("Admin audit: product updated", { adminId: req.user.id, productId: product.id });
   } catch (error) {
     console.error("Update product error:", error);
 
@@ -98,6 +128,9 @@ const updateProduct = async (req, res) => {
 };
 const deleteProduct = async (req, res) => {
   try {
+    if (!isValidProductId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid product ID." });
+    }
     const product = await Product.findByIdAndDelete(req.params.id);
 
     if (!product) {
@@ -109,6 +142,7 @@ const deleteProduct = async (req, res) => {
     res.status(200).json({
       message: "Product deleted successfully",
     });
+    console.info("Admin audit: product deleted", { adminId: req.user.id, productId: product.id });
   } catch (error) {
     console.error("Delete product error:", error);
 

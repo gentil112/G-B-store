@@ -90,7 +90,9 @@ const CartPage = () => {
                   <button
                     type="button"
                     onClick={() => increaseQuantity(item._id)}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-gray-300 bg-white text-xl font-bold text-gray-900 shadow-sm transition hover:border-primary hover:text-primary dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    disabled={item.quantity >= (Number(item.stock) || 0)}
+                    aria-label={`Increase ${item.name} quantity`}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-gray-300 bg-white text-xl font-bold text-gray-900 shadow-sm transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                   >
                     +
                   </button>

@@ -14,6 +14,8 @@ const Products = () => {
 
   // Store error message
   const [error, setError] = useState("");
+  const [showAllProducts, setShowAllProducts] = useState(false);
+  const visibleProducts = showAllProducts ? products : products.slice(0, 5);
 
   // Get products from our Express backend
   useEffect(() => {
@@ -103,9 +105,9 @@ const Products = () => {
 
           {/* Products */}
           {!loading && !error && (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:gap-5">
+            <div id="product-grid" className="grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:gap-5">
               {/* Product cards */}
-              {products.map((product, index) => (
+              {visibleProducts.map((product, index) => (
                 <Link
                   to={`/product/${product._id}`}
                   key={product._id}
@@ -144,7 +146,7 @@ const Products = () => {
                         <p className="text-[8px] sm:text-xs text-gray-500 dark:text-gray-400">
                           {product.stock > 0
                             ? `${product.stock} in stock`
-                            : "Out of stock"}
+                            : "Out of Stock"}
                         </p>
 
                         <span className="text-xs sm:text-sm font-black text-gray-900 dark:text-white">
@@ -159,12 +161,25 @@ const Products = () => {
           )}
 
           {/* View all button */}
-          <div className="flex justify-center">
-            <button className="mt-6 sm:mt-12 flex cursor-pointer items-center gap-2 sm:gap-3 rounded-full bg-gray-950 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary">
-              View all pieces
-              <FiArrowUpRight className="text-lg" />
-            </button>
-          </div>
+          {!loading && !error && products.length > 0 && (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  if (products.length > 5) {
+                    setShowAllProducts((isShowingAll) => !isShowingAll);
+                  } else {
+                    document.getElementById("product-grid")?.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                aria-expanded={showAllProducts}
+                className="mt-6 sm:mt-12 flex cursor-pointer items-center gap-2 sm:gap-3 rounded-full bg-gray-950 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary"
+              >
+                {showAllProducts ? "Show fewer pieces" : "View all pieces"}
+                <FiArrowUpRight className={`text-lg transition-transform ${showAllProducts ? "rotate-[-45deg]" : ""}`} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

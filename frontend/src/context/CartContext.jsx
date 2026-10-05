@@ -23,9 +23,13 @@ export const CartProvider = ({ children }) => {
       const existingProduct = previousItems.find(
         (item) => item._id === product._id,
       );
+      const stock = Number(product.stock) || 0;
+
+      if (stock < 1) return previousItems;
 
       // If product already exists, increase quantity
       if (existingProduct) {
+        if (existingProduct.quantity >= stock) return previousItems;
         return previousItems.map((item) =>
           item._id === product._id
             ? {
@@ -64,7 +68,7 @@ export const CartProvider = ({ children }) => {
   const increaseQuantity = (productId) => {
     setCartItems((previousItems) =>
       previousItems.map((item) =>
-        item._id === productId
+        item._id === productId && item.quantity < (Number(item.stock) || 0)
           ? {
               ...item,
               quantity: item.quantity + 1,

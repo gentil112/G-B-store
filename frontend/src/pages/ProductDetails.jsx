@@ -152,7 +152,7 @@ const ProductDetails = () => {
                 <span className="font-normal">
                   {product.stock > 0
                     ? `${product.stock} available`
-                    : "Out of stock"}
+                    : "Out of Stock"}
                 </span>
               </p>
             </div>
@@ -163,7 +163,7 @@ const ProductDetails = () => {
               disabled={product.stock === 0}
               className="mt-8 w-full rounded-full bg-gray-950 px-6 py-4 text-sm font-bold uppercase tracking-wider text-white transition hover:bg-primary disabled:cursor-not-allowed disabled:bg-gray-400"
             >
-              {product.stock > 0 ? "Add to cart" : "Out of stock"}
+              {product.stock > 0 ? "Add to cart" : "Out of Stock"}
             </button>
           </div>
         </div>

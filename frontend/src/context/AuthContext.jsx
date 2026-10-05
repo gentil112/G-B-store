@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
+import { API_BASE_URL } from "../config/api";
 
 const AuthContext = createContext();
 
@@ -16,14 +17,31 @@ export const AuthProvider = ({ children }) => {
       localStorage.getItem("authToken") || localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
 
-    if (storedToken) {
-      setToken(storedToken);
-      setIsAuthenticated(true);
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
+    if (!storedToken) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+    setToken(storedToken);
+    setIsAuthenticated(true);
+    if (storedUser) setUser(JSON.parse(storedUser));
+    fetch(`${API_BASE_URL}/auth/me`, {
+      headers: { Authorization: `Bearer ${storedToken}` },
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Session expired");
+        const data = await response.json();
+        setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
+      })
+      .catch(() => {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const login = (userData, authToken) => {

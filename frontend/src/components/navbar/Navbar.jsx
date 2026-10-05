@@ -238,6 +238,18 @@ const Navbar = () => {
                       >
                         My Orders
                       </button>
+                      {user?.role === "admin" && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAccountMenuOpen(false);
+                            navigate("/admin");
+                          }}
+                          className="block w-full px-4 py-2 text-left text-sm font-bold text-primary transition hover:bg-primary/10"
+                        >
+                          Admin Dashboard
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => {

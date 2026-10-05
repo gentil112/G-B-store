@@ -22,7 +22,7 @@ const CheckoutPage = () => {
   const [success, setSuccess] = useState("");
   const [confirmedOrder, setConfirmedOrder] = useState(null);
 
-  const totalPrice = cartItems.reduce(
+  const estimatedTotal = cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
@@ -47,16 +47,9 @@ const CheckoutPage = () => {
 
         items: cartItems.map((item) => ({
           productId: item._id,
-          name: item.name,
-          price: item.price,
           quantity: item.quantity,
-          image: item.image,
         })),
-
-        totalPrice,
       };
-
-      console.log("Sending order:", orderData);
 
       const response = await fetch(`${API_BASE_URL}/orders`, {
         method: "POST",
@@ -74,8 +67,6 @@ const CheckoutPage = () => {
       if (!response.ok) {
         throw new Error(data.message || "Failed to place order");
       }
-
-      console.log("Order created:", data);
 
       clearCart();
 
@@ -353,7 +344,7 @@ const CheckoutPage = () => {
               </span>
 
               <span className="text-xl font-black text-primary">
-                {totalPrice.toLocaleString()} Rwf
+              {estimatedTotal.toLocaleString()} Rwf
               </span>
             </div>
           </div>

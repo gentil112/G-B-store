@@ -14,8 +14,6 @@ const Products = () => {
 
   // Store error message
   const [error, setError] = useState("");
-  const [showAllProducts, setShowAllProducts] = useState(false);
-  const visibleProducts = showAllProducts ? products : products.slice(0, 5);
 
   // Get products from our Express backend
   useEffect(() => {
@@ -107,7 +105,7 @@ const Products = () => {
           {!loading && !error && (
             <div id="product-grid" className="grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:gap-5">
               {/* Product cards */}
-              {visibleProducts.map((product, index) => (
+              {products.slice(0, 5).map((product, index) => (
                 <Link
                   to={`/product/${product._id}`}
                   key={product._id}
@@ -163,21 +161,13 @@ const Products = () => {
           {/* View all button */}
           {!loading && !error && products.length > 0 && (
             <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() => {
-                  if (products.length > 5) {
-                    setShowAllProducts((isShowingAll) => !isShowingAll);
-                  } else {
-                    document.getElementById("product-grid")?.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                aria-expanded={showAllProducts}
+              <Link
+                to="/products"
                 className="mt-6 sm:mt-12 flex cursor-pointer items-center gap-2 sm:gap-3 rounded-full bg-gray-950 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary"
               >
-                {showAllProducts ? "Show fewer pieces" : "View all pieces"}
-                <FiArrowUpRight className={`text-lg transition-transform ${showAllProducts ? "rotate-[-45deg]" : ""}`} />
-              </button>
+                View all pieces
+                <FiArrowUpRight className="text-lg transition-transform" />
+              </Link>
             </div>
           )}
         </div>

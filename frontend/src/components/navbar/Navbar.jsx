@@ -3,7 +3,7 @@ import { IoMdSearch } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
 import { FaCaretDown } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import DarkMode from "./DarkMode";
 import { useAuth } from "../../context/AuthContext";
 import { apiCall } from "../../hooks/useApi";
@@ -135,8 +135,9 @@ const Navbar = () => {
       <div className="bg-primary/40 py-2 sm:py-0 ">
         <div className="w-full flex justify-between items-center gap-2 px-5">
           <div>
-            <a
-              href="#"
+            <Link
+              to="/"
+              aria-label="G&B Store home"
               className="flex items-center gap-2 sm:gap-3 rounded-full border border-black/10 bg-white/70 px-2 sm:px-3 py-2 sm:py-1.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md dark:border-white/10 dark:bg-gray-900/60 flex-shrink-0"
             >
               <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-xs sm:text-sm font-black text-white shadow-md">
@@ -145,7 +146,7 @@ const Navbar = () => {
               <span className="text-sm sm:text-lg font-black tracking-[0.15em] sm:tracking-[0.25em] text-gray-900 dark:text-white whitespace-nowrap">
                 STORE
               </span>
-            </a>
+            </Link>
           </div>
           {/* search and controls bar  */}
           <div

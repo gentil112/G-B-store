@@ -3,6 +3,7 @@ const express = require("express");
 const {
   createProduct,
   getProducts,
+  getTopProducts,
   getProductById,
   updateProduct,
   deleteProduct,
@@ -14,6 +15,7 @@ const requireAdmin = require("../middleware/adminMiddleware");
 
 router.post("/", protect, requireAdmin, createProduct);
 router.get("/", getProducts);
+router.get("/top", getTopProducts);
 router.get("/:id", getProductById);
 router.put("/:id", protect, requireAdmin, updateProduct);
 router.delete("/:id", protect, requireAdmin, deleteProduct);

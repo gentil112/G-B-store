@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const Order = require("../models/Order");
 const mongoose = require("mongoose");
 
 const isNumericValue = (value) =>
@@ -70,6 +71,48 @@ const getProducts = async (req, res) => {
     });
   }
 };
+
+const getTopProducts = async (req, res) => {
+  try {
+    const sales = await Order.aggregate([
+      { $match: { status: { $ne: "cancelled" } } },
+      { $unwind: "$items" },
+      {
+        $group: {
+          _id: "$items.productId",
+          unitsSold: { $sum: "$items.quantity" },
+        },
+      },
+      { $sort: { unitsSold: -1, "_id": 1 } },
+    ]);
+
+    const rankedSales = sales.filter(({ _id }) =>
+      mongoose.isValidObjectId(_id),
+    );
+    const productsById = new Map(
+      (await Product.find({
+        _id: { $in: rankedSales.map(({ _id }) => _id) },
+      })).map((product) => [product.id, product]),
+    );
+
+    const products = rankedSales
+      .map(({ _id, unitsSold }) => {
+        const product = productsById.get(_id.toString());
+        return product ? { ...product.toObject(), unitsSold } : null;
+      })
+      .filter(Boolean)
+      .slice(0, 3);
+
+    res.status(200).json({ products });
+  } catch (error) {
+    console.error("Get top products error:", error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
 const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -155,6 +198,7 @@ const deleteProduct = async (req, res) => {
 module.exports = {
   createProduct,
   getProducts,
+  getTopProducts,
   getProductById,
   updateProduct,
   deleteProduct,

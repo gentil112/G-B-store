@@ -29,8 +29,10 @@ const HomePage = () => {
       <Products />
       <TopProducts />
       <Banner />
-      <Subscribe />
-      <Testimonials />
+      <div className="bg-[#fcfaf7] pb-16 transition-colors duration-300 dark:bg-gray-950">
+        <Subscribe />
+        <Testimonials />
+      </div>
       <Footer />
     </>
   );

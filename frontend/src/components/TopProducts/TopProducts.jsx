@@ -47,7 +47,7 @@ const TopProducts = () => {
   };
 
   return (
-    <section className="py-10 sm:py-16">
+    <section className="bg-[#fcfaf7] py-10 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-white sm:py-16">
       <div className="container">
         <header className="mb-8 text-center sm:mb-12">
           <p
@@ -79,7 +79,7 @@ const TopProducts = () => {
             {Array.from({ length: 3 }, (_, index) => (
               <div
                 key={index}
-                className="w-full max-w-[300px] rounded-3xl bg-white p-4 shadow-lg dark:bg-gray-800"
+                className="w-full max-w-[300px] rounded-3xl border border-black/5 bg-white p-4 shadow-lg dark:border-white/10 dark:bg-gray-900"
               >
                 <Skeleton className="h-[200px] w-full rounded-2xl sm:h-[280px]" />
                 <Skeleton className="mt-4 h-5 w-3/4" />
@@ -108,9 +108,9 @@ const TopProducts = () => {
               <article
                 key={product._id}
                 data-aos="zoom-in"
-                className="group relative flex h-full w-full max-w-[300px] flex-col overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:bg-gray-800"
+                className="group relative flex h-full w-full max-w-[300px] flex-col overflow-hidden rounded-3xl border border-black/5 bg-white shadow-lg transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:border-white/10 dark:bg-gray-900"
               >
-                <span className="absolute left-4 top-4 z-10 rounded-full bg-yellow-400 px-3 py-1 text-xs font-bold text-gray-800 shadow-md">
+                <span className="absolute left-4 top-4 z-10 rounded-full bg-yellow-400 px-3 py-1 text-xs font-bold text-gray-900 shadow-md dark:bg-amber-500 dark:text-gray-950">
                   #{index + 1} Best seller
                 </span>
 
@@ -123,7 +123,7 @@ const TopProducts = () => {
                       : `Add ${product.name} to favorites`
                   }
                   aria-pressed={likedIds.has(product._id)}
-                  className="absolute right-4 top-4 z-10 rounded-full bg-white p-2.5 shadow-md transition hover:scale-110 dark:bg-gray-700"
+                  className="absolute right-4 top-4 z-10 rounded-full bg-white p-2.5 shadow-md transition hover:scale-110 dark:bg-gray-800"
                 >
                   <FaHeart
                     className={`text-lg transition-colors ${
@@ -135,7 +135,7 @@ const TopProducts = () => {
                 </button>
 
                 <Link to={`/product/${product._id}`} className="block">
-                  <div className="flex h-[200px] items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-700 sm:h-[280px]">
+                  <div className="flex h-[200px] items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-800 sm:h-[280px]">
                     <img
                       src={product.image}
                       alt={product.name}
@@ -170,7 +170,7 @@ const TopProducts = () => {
                     type="button"
                     onClick={() => addToCart(product)}
                     disabled={product.stock < 1}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-gray-400"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-semibold text-gray-950 transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-700"
                   >
                     <FaShoppingCart className="text-sm" />
                     {product.stock > 0 ? "Add to cart" : "Out of stock"}

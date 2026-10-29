@@ -50,7 +50,7 @@ const Testimonials = () => {
   };
 
   return (
-    <section className="mb-16">
+    <section className="bg-[#fcfaf7] py-12 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-white sm:py-16">
       <div className="mx-auto max-w-5xl px-4">
         <div className="mb-8 text-center">
           <p

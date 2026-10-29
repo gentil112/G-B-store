@@ -4,6 +4,7 @@ import Image2 from "../../assets/hero/people.png";
 import Image3 from "../../assets/hero/Sale.png";
 import Slider from "react-slick";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 const SliderComponent = Slider?.default || Slider;
 const ImageList = [
   {
@@ -109,14 +110,15 @@ const Hero = () => {
                     data-aos-delay="300"
                     className="flex justify-center sm:justify-start"
                   >
-                    <button
+                    <Link
+                      to="/products"
                       className="bg-gradient-to-r
               from-primary to-secondary hover:scale-105
               duration-200 text-white py-2 px-4 sm:py-2.5 sm:px-5
               rounded-full font-semibold text-sm sm:text-base shadow-lg shadow-orange-900/20"
                     >
                       Order Now
-                    </button>
+                    </Link>
                   </div>
                 </div>
                 {/* image  section */}

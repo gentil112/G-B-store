@@ -28,49 +28,49 @@
       "source": "/product/(.*)",
       "destination": {
         "service": "frontend",
-        "path": "/"
+        "path": "/index.html"
       }
     },
     {
       "source": "/cart",
       "destination": {
         "service": "frontend",
-        "path": "/"
+        "path": "/index.html"
       }
     },
     {
       "source": "/checkout",
       "destination": {
         "service": "frontend",
-        "path": "/"
+        "path": "/index.html"
       }
     },
     {
       "source": "/my-orders",
       "destination": {
         "service": "frontend",
-        "path": "/"
+        "path": "/index.html"
       }
     },
     {
       "source": "/admin",
       "destination": {
         "service": "frontend",
-        "path": "/"
+        "path": "/index.html"
       }
     },
     {
       "source": "/order-confirmation",
       "destination": {
         "service": "frontend",
-        "path": "/"
+        "path": "/index.html"
       }
     },
     {
       "source": "/login",
       "destination": {
         "service": "frontend",
-        "path": "/"
+        "path": "/index.html"
       }
     },
     {

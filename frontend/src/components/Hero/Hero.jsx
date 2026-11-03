@@ -111,7 +111,7 @@ const Hero = () => {
                     className="flex justify-center sm:justify-start"
                   >
                     <Link
-                      to="/products"
+                      to="/collection"
                       className="bg-gradient-to-r
               from-primary to-secondary hover:scale-105
               duration-200 text-white py-2 px-4 sm:py-2.5 sm:px-5

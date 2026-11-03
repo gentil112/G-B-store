@@ -73,7 +73,7 @@ const Banner = () => {
             </div>
 
             <Link
-              to="/collection"
+              to="/products"
               data-aos="fade-up"
               className="mt-8 inline-flex items-center gap-8 bg-[#26211b] px-6 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:bg-[#9b754b] dark:bg-[#f5efe6] dark:text-[#26211b] dark:hover:bg-[#d4ad7e]"
             >

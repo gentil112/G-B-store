@@ -13,7 +13,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ProductDetails from "./pages/ProductDetails";
 import ProductsPage from "./pages/ProductsPage";
 import AOS from "aos";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -91,9 +91,9 @@ const App = () => {
           {/* Product Details page */}
           <Route path="/product/:id" element={<ProductDetails />} />
 
-          {/* Full product collection */}
+          {/* All products page */}
           <Route
-            path="/collection"
+            path="/products"
             element={
               <>
                 <Navbar />
@@ -102,7 +102,6 @@ const App = () => {
               </>
             }
           />
-          <Route path="/products" element={<Navigate to="/collection" replace />} />
 
           {/* Everything else */}
           <Route

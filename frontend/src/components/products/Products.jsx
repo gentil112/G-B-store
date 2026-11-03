@@ -43,7 +43,7 @@ const Products = () => {
     <div id="products" className="bg-[#fcfaf7] py-10 sm:py-20 dark:bg-gray-950">
       <div className="container px-3 sm:px-0">
         {/* Header section */}
-        <div         className="mx-auto mb-7 max-w-[600px] text-center sm:mb-10">
+        <div className="text-center mb-5 sm:mb-10 max-w-[600px] mx-auto">
           <p
             data-aos="fade-up"
             className="text-xs font-bold uppercase tracking-[0.28em] text-primary"
@@ -55,14 +55,14 @@ const Products = () => {
             data-aos="fade-up"
             className="mt-2 text-2xl sm:text-4xl font-black tracking-tight text-gray-900 dark:text-white md:text-5xl"
           >
-            The collection
+            Our products
           </h1>
 
           <p
             data-aos="fade-up"
             className="mt-2 sm:mt-4 text-xs sm:text-sm leading-6 text-gray-500 dark:text-gray-400"
           >
-            Explore all products, thoughtfully chosen for everyday style.
+            T-shirt, pants and hoodie
           </p>
         </div>
 
@@ -103,9 +103,9 @@ const Products = () => {
 
           {/* Products */}
           {!loading && !error && (
-            <div id="product-grid"             className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+            <div id="product-grid" className="grid grid-cols-2 gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 sm:gap-5">
               {/* Product cards */}
-              {products.slice(0, 4).map((product, index) => (
+              {products.slice(0, 5).map((product, index) => (
                 <Link
                   to={`/product/${product._id}`}
                   key={product._id}
@@ -114,34 +114,34 @@ const Products = () => {
                   <div
                     data-aos="fade-up"
                     data-aos-delay={index * 200}
-                    className="group relative overflow-hidden rounded-[1.35rem] border border-[#b99467]/15 bg-white p-2.5 shadow-[0_12px_35px_rgba(55,35,20,0.07)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(55,35,20,0.14)] dark:border-white/10 dark:bg-gray-900 sm:p-3"
+                    className="group relative overflow-hidden rounded-[1.35rem] border border-black/[0.06] bg-white p-3 shadow-[0_12px_35px_rgba(55,35,20,0.07)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(55,35,20,0.14)] dark:border-white/10 dark:bg-gray-900"
                   >
                     {/* Product image */}
                     <div className="relative overflow-hidden rounded-[1rem] bg-[#f2ece4] dark:bg-gray-800">
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="h-[180px] w-full object-cover transition duration-700 ease-out group-hover:scale-105 sm:h-[300px]"
+                        className="h-[150px] w-full object-cover transition duration-700 ease-out group-hover:scale-105 sm:h-[275px]"
                       />
                     </div>
 
                     {/* Product information */}
-                    <div className="px-1 pb-2 pt-3 sm:px-2 sm:pb-3 sm:pt-4">
+                    <div className="px-1 pb-1 pt-2 sm:pt-4">
                       {/* Category */}
                       <div className="mb-1 sm:mb-2 flex items-center justify-between gap-1 sm:gap-2">
-                        <p className="text-[8px] font-semibold uppercase tracking-[0.16em] text-[#9b754b] sm:text-[10px]">
+                        <p className="text-[7px] sm:text-[10px] font-bold uppercase tracking-[0.16em] text-gray-400">
                           {product.category}
                         </p>
                       </div>
 
                       {/* Product name */}
-                      <h3 className="truncate text-sm font-semibold text-gray-900 dark:text-white sm:text-base">
+                      <h3 className="truncate text-xs sm:text-base font-bold text-gray-900 dark:text-white">
                         {product.name}
                       </h3>
 
                       {/* Stock and price */}
                       <div className="mt-1 flex items-center justify-between gap-1">
-                        <p className="text-[9px] text-gray-500 dark:text-gray-400 sm:text-xs">
+                        <p className="text-[8px] sm:text-xs text-gray-500 dark:text-gray-400">
                           {product.stock > 0
                             ? `${product.stock} in stock`
                             : "Out of Stock"}
@@ -162,10 +162,10 @@ const Products = () => {
           {!loading && !error && products.length > 0 && (
             <div className="flex justify-center">
               <Link
-                to="/collection"
-                className="mt-8 inline-flex cursor-pointer items-center gap-3 rounded-full bg-gray-950 px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(55,35,20,0.16)] transition hover:bg-primary sm:mt-10 sm:px-7 sm:py-3.5 sm:text-sm"
+                to="/products"
+                className="mt-6 sm:mt-12 flex cursor-pointer items-center gap-2 sm:gap-3 rounded-full bg-gray-950 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-bold uppercase tracking-[0.12em] text-white transition hover:bg-primary"
               >
-                Explore all products
+                View all pieces
                 <FiArrowUpRight className="text-lg transition-transform" />
               </Link>
             </div>

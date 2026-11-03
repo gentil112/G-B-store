@@ -68,7 +68,7 @@ const FooterInfoPage = () => {
           {page.message}
         </p>
         <Link
-          to="/collection"
+          to="/products"
           className="mt-8 inline-flex rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-secondary"
         >
           Browse products

@@ -3,19 +3,33 @@ const Order = require("../models/Order");
 const mongoose = require("mongoose");
 
 const isNumericValue = (value) =>
-  (typeof value === "number" || (typeof value === "string" && value.trim() !== "")) &&
+  (typeof value === "number" ||
+    (typeof value === "string" && value.trim() !== "")) &&
   Number.isFinite(Number(value));
 
 const validateProductInput = (body) => {
   const { name, description, price, image, category, stock } = body || {};
   if (
-    typeof name !== "string" || !name.trim() || name.trim().length > 120 ||
-    typeof description !== "string" || !description.trim() || description.length > 5000 ||
-    typeof image !== "string" || !image.trim() || image.length > 2048 ||
-    typeof category !== "string" || !category.trim() || category.trim().length > 80 ||
-    !isNumericValue(price) || Number(price) < 0 ||
-    (stock !== undefined && (!isNumericValue(stock) || !Number.isSafeInteger(Number(stock)) || Number(stock) < 0))
-  ) return null;
+    typeof name !== "string" ||
+    !name.trim() ||
+    name.trim().length > 120 ||
+    typeof description !== "string" ||
+    !description.trim() ||
+    description.length > 5000 ||
+    typeof image !== "string" ||
+    !image.trim() ||
+    image.length > 2048 ||
+    typeof category !== "string" ||
+    !category.trim() ||
+    category.trim().length > 80 ||
+    !isNumericValue(price) ||
+    Number(price) < 0 ||
+    (stock !== undefined &&
+      (!isNumericValue(stock) ||
+        !Number.isSafeInteger(Number(stock)) ||
+        Number(stock) < 0))
+  )
+    return null;
 
   return {
     name: name.trim(),
@@ -35,13 +49,17 @@ const createProduct = async (req, res) => {
     const productData = validateProductInput(req.body);
     if (!productData) {
       return res.status(400).json({
-        message: "Provide a name, description, image, category, non-negative price, and whole-number stock.",
+        message:
+          "Provide a name, description, image, category, non-negative price, and whole-number stock.",
       });
     }
 
     // Create product
     const product = await Product.create(productData);
-    console.info("Admin audit: product created", { adminId: req.user.id, productId: product.id });
+    console.info("Admin audit: product created", {
+      adminId: req.user.id,
+      productId: product.id,
+    });
 
     // Send created product back
     res.status(201).json({
@@ -83,16 +101,18 @@ const getTopProducts = async (req, res) => {
           unitsSold: { $sum: "$items.quantity" },
         },
       },
-      { $sort: { unitsSold: -1, "_id": 1 } },
+      { $sort: { unitsSold: -1, _id: 1 } },
     ]);
 
     const rankedSales = sales.filter(({ _id }) =>
       mongoose.isValidObjectId(_id),
     );
     const productsById = new Map(
-      (await Product.find({
-        _id: { $in: rankedSales.map(({ _id }) => _id) },
-      })).map((product) => [product.id, product]),
+      (
+        await Product.find({
+          _id: { $in: rankedSales.map(({ _id }) => _id) },
+        })
+      ).map((product) => [product.id, product]),
     );
 
     const products = rankedSales
@@ -142,13 +162,18 @@ const updateProduct = async (req, res) => {
     const productData = validateProductInput(req.body);
     if (!productData) {
       return res.status(400).json({
-        message: "Provide a name, description, image, category, non-negative price, and whole-number stock.",
+        message:
+          "Provide a name, description, image, category, non-negative price, and whole-number stock.",
       });
     }
-    const product = await Product.findByIdAndUpdate(req.params.id, productData, {
-      new: true,
-      runValidators: true,
-    });
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      productData,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
     if (!product) {
       return res.status(404).json({
@@ -160,7 +185,10 @@ const updateProduct = async (req, res) => {
       message: "Product updated successfully",
       product,
     });
-    console.info("Admin audit: product updated", { adminId: req.user.id, productId: product.id });
+    console.info("Admin audit: product updated", {
+      adminId: req.user.id,
+      productId: product.id,
+    });
   } catch (error) {
     console.error("Update product error:", error);
 
@@ -185,7 +213,10 @@ const deleteProduct = async (req, res) => {
     res.status(200).json({
       message: "Product deleted successfully",
     });
-    console.info("Admin audit: product deleted", { adminId: req.user.id, productId: product.id });
+    console.info("Admin audit: product deleted", {
+      adminId: req.user.id,
+      productId: product.id,
+    });
   } catch (error) {
     console.error("Delete product error:", error);
 

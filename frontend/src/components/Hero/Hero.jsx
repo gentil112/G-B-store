@@ -1,11 +1,13 @@
 import React from "react";
+import Slider from "react-slick";
+import { FaArrowRight, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
+import { Link } from "react-router-dom";
 import Image1 from "../../assets/hero/women.png";
 import Image2 from "../../assets/hero/people.png";
 import Image3 from "../../assets/hero/Sale.png";
-import Slider from "react-slick";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa6";
-import { Link } from "react-router-dom";
+
 const SliderComponent = Slider?.default || Slider;
+
 const ImageList = [
   {
     id: 1,
@@ -41,99 +43,68 @@ const Hero = () => {
     pauseOnHover: false,
     pauseOnFocus: true,
     customPaging: () => (
-      <button className="mt-4 h-2.5 w-2.5 rounded-full bg-orange-200 transition-all duration-300 hover:bg-primary" />
+      <button className="hero-slider-dot" />
     ),
     prevArrow: (
-      <button className="absolute left-0 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/40 bg-white/80 p-3 text-primary shadow-lg backdrop-blur-sm transition hover:scale-105 hover:bg-primary hover:text-white">
-        <FaArrowLeft className="text-sm" />
+      <button
+        type="button"
+        aria-label="Previous slide"
+        className="hero-slider-arrow"
+      >
+        <FaChevronLeft aria-hidden="true" />
       </button>
     ),
     nextArrow: (
-      <button className="absolute right-0 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/40 bg-white/80 p-3 text-primary shadow-lg backdrop-blur-sm transition hover:scale-105 hover:bg-primary hover:text-white">
-        <FaArrowRight className="text-sm" />
+      <button
+        type="button"
+        aria-label="Next slide"
+        className="hero-slider-arrow"
+      >
+        <FaChevronRight aria-hidden="true" />
       </button>
     ),
   };
+
   return (
-    <div
-      className="relative min-h-[90vh] sm:min-h-[650px] md:min-h-[750px] overflow-hidden
-     flex justify-center
-     items-center dark:bg-gray-950 dark:text-white
-     duration-200"
+    <section
+      aria-label="Featured collections"
+      className="relative flex min-h-[90vh] items-center overflow-hidden bg-[#f7f4ef] text-[#29241e] transition-colors duration-300 dark:bg-[#171511] dark:text-[#f3eee6] sm:min-h-[650px] md:min-h-[750px]"
     >
-      {/* background pattern */}
-      <div
-        className="h-[400px] w-[400px] sm:h-[700px] sm:w-[700px] bg-primary/30
-      absolute -top-1/2 left-1/4  rounded-[3rem] rotate-45
-      -z-9 shadow-[0_20px_80px_-30px_rgba(251,146,60,0.8)]"
-      ></div>
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(251,146,60,0.14)_1px,transparent_1px),linear-gradient(to_bottom,rgba(251,146,60,0.14)_1px,transparent_1px)] bg-[size:26px_26px] opacity-60" />
-      {/* hero section */}
-      <div className="container relative z-10 py-4 sm:py-0 px-3 sm:px-0">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_76%_44%,rgba(195,160,119,0.18),transparent_48%)]" />
+      <div className="container hero-slider relative z-10 px-3 py-8 sm:px-0 sm:py-12">
         <SliderComponent {...settings}>
           {ImageList.map((data) => (
             <div key={data.id}>
-              <div className="grid grid-cols-1 items-center gap-3 sm:gap-6 sm:grid-cols-2">
-                {/* text content section */}
-                <div
-                  className=" flex flex-col justify-center gap-2 sm:gap-4
-          pt-2 sm:pt-0 text-center sm:text-left
-          order-2 sm:order-1 relative z-10"
-                >
-                  <p
-                    data-aos="fade-up"
-                    data-aos-duration="500"
-                    className="text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] sm:tracking-[0.4em] text-primary"
-                  >
+              <div className="grid min-h-[620px] grid-cols-1 items-center gap-3 sm:min-h-[560px] sm:grid-cols-[0.9fr_1.1fr] sm:gap-8 lg:gap-14">
+                <div className="order-2 flex flex-col items-center text-center sm:order-1 sm:items-start sm:pl-8 sm:text-left lg:pl-12">
+                  <p className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#927650] dark:text-[#c6a77d] sm:text-xs">
+                    <span className="h-px w-8 bg-current" aria-hidden="true" />
                     Fashion Forward
                   </p>
-                  <h1
-                    data-aos="zoom-out"
-                    data-aos-duration="500"
-                    data-aos-once="true"
-                    className="text-3xl sm:text-5xl md:text-6xl
-                     lg:text-7xl font-black uppercase tracking-tight"
-                  >
+                  <h1 className="max-w-[12ch] font-serif text-[clamp(2.7rem,5.5vw,5.4rem)] font-normal leading-[0.98] tracking-[-0.045em]">
                     {data.title}
                   </h1>
-                  <p
-                    data-aos="fade-up"
-                    data-aos-duration="500"
-                    data-aos-delay="100"
-                    className="text-xs sm:text-sm text-gray-600 dark:text-gray-300"
-                  >
+                  <p className="mt-6 max-w-md text-sm leading-7 text-[#71685e] dark:text-[#c4bbb0] sm:text-base">
                     {data.description}
                   </p>
-                  <div
-                    data-aos="fade-up"
-                    data-aos-duration="500"
-                    data-aos-delay="300"
-                    className="flex justify-center sm:justify-start"
+                  <Link
+                    to="/products"
+                    className="mt-8 inline-flex min-h-12 items-center justify-center bg-[#29241e] px-7 text-xs font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-200 hover:bg-[#68543d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#927650] dark:bg-[#eee7dc] dark:text-[#29241e] dark:hover:bg-white"
                   >
-                    <Link
-                      to="/products"
-                      className="bg-gradient-to-r
-              from-primary to-secondary hover:scale-105
-              duration-200 text-white py-2 px-4 sm:py-2.5 sm:px-5
-              rounded-full font-semibold text-sm sm:text-base shadow-lg shadow-orange-900/20"
-                    >
-                      Order Now
-                    </Link>
-                  </div>
+                    Order Now
+                    <FaArrowRight
+                      aria-hidden="true"
+                      className="ml-4 text-xs"
+                    />
+                  </Link>
                 </div>
-                {/* image  section */}
-                <div className="order-1 sm:order-2">
-                  <div
-                    data-aos="zoom-in"
-                    data-aos-once="true"
-                    className="relative z-10 rounded-[2rem] bg-white/40 p-4 shadow-[0_25px_80px_-30px_rgba(0,0,0,0.45)] backdrop-blur-sm dark:bg-gray-900/40"
-                  >
+
+                <div className="order-1 mx-auto w-full max-w-[500px] sm:order-2">
+                  <div className="hero-product-image group relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_50%_42%,#fffdfa_0%,#eee7dd_72%,#e5dbce_100%)] p-5 shadow-[0_28px_70px_-38px_rgba(47,35,23,0.5)] dark:bg-[radial-gradient(ellipse_at_50%_42%,#39342d_0%,#2b2721_72%,#211e1a_100%)] sm:p-8">
                     <img
                       src={data.img}
                       alt=""
-                      className="w-[180px] h-[180px] sm:w-[300px] sm:h-[300px] md:h-[450px]
-              md:w-[450px] sm:scale-100
-              object-contain mx-auto"
+                      className="h-full w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.025]"
                     />
                   </div>
                 </div>
@@ -142,7 +113,7 @@ const Hero = () => {
           ))}
         </SliderComponent>
       </div>
-    </div>
+    </section>
   );
 };
 

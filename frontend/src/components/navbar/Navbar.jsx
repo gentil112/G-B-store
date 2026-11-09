@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { IoMdSearch } from "react-icons/io";
 import { FaCartShopping } from "react-icons/fa6";
-import { FaCaretDown } from "react-icons/fa";
+import { FiChevronDown, FiMenu, FiUser, FiX } from "react-icons/fi";
 import { MdLogout } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import DarkMode from "./DarkMode";
@@ -9,25 +8,16 @@ import { useAuth } from "../../context/AuthContext";
 import { apiCall } from "../../hooks/useApi";
 import { useCart } from "../../context/CartContext";
 const Menu = [
-  {
-    id: 1,
-    name: "Home",
-    link: "/#",
-  },
-  { id: 2, name: "Top Rated", link: "/#products" },
-  { id: 3, name: "T-shirts", link: "/#products" },
-  { id: 4, name: "Pants", link: "/#products" },
-];
-const DropdownLinks = [
-  { id: 1, name: "Trending products", link: "/#" },
-  { id: 2, name: "Best Sellers", link: "/#" },
-  { id: 3, name: "Top rated", link: "/#" },
+  { id: 1, name: "Home", link: "/" },
+  { id: 2, name: "Shop all", link: "/products" },
+  { id: 3, name: "Featured", link: "/#products" },
 ];
 const Navbar = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user, logout, login } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authMode, setAuthMode] = useState("register");
   const [formData, setFormData] = useState({
     name: "",
@@ -127,98 +117,83 @@ const Navbar = () => {
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <div
-      className=" shadow-md bg-white dark:bg-gray-900
-     dark:text-white"
-    >
-      {/* upper navbar */}
-      <div className="bg-primary/40 py-2 sm:py-0 ">
-        <div className="w-full flex justify-between items-center gap-2 px-5">
-          <div>
+    <div className="relative z-50 border-b border-[#b99467]/20 bg-[#fffefa] text-gray-900 shadow-[0_8px_30px_rgba(55,35,20,0.06)] dark:border-white/10 dark:bg-gray-950 dark:text-white">
+      <div className="border-b border-[#b99467]/15 bg-[#f7f1e8] py-1.5 text-center text-[9px] font-semibold uppercase tracking-[0.24em] text-[#816345] dark:border-white/5 dark:bg-[#211d19] dark:text-[#d4ad7e] sm:text-[10px]">
+        Thoughtfully chosen · effortlessly yours
+      </div>
+      <header className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
+        <div className="flex min-h-[72px] items-center justify-between gap-2 sm:min-h-[82px] sm:gap-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4 lg:gap-10">
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
+              aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls={isMobileMenuOpen ? "mobile-navigation" : undefined}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#b99467]/20 text-[#514332] transition hover:border-primary hover:text-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary lg:hidden dark:text-[#f5efe6]"
+            >
+              {isMobileMenuOpen ? <FiX size={19} /> : <FiMenu size={19} />}
+            </button>
             <Link
               to="/"
               aria-label="G&B Store home"
-              className="flex items-center gap-2 sm:gap-3 rounded-full border border-black/10 bg-white/70 px-2 sm:px-3 py-2 sm:py-1.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md dark:border-white/10 dark:bg-gray-900/60 flex-shrink-0"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex shrink-0 items-center gap-2.5 sm:gap-3"
             >
-              <span className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-xs sm:text-sm font-black text-white shadow-md">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-xs font-black text-white shadow-[0_4px_12px_rgba(237,137,0,0.28)] sm:h-10 sm:w-10 sm:text-sm">
                 G&B
               </span>
-              <span className="text-sm sm:text-lg font-black tracking-[0.15em] sm:tracking-[0.25em] text-gray-900 dark:text-white whitespace-nowrap">
-                STORE
+              <span>
+                <span className="block whitespace-nowrap text-[13px] font-black tracking-[0.2em] text-gray-900 dark:text-white sm:text-base sm:tracking-[0.28em]">STORE</span>
+                <span className="mt-0.5 hidden text-[8px] uppercase tracking-[0.2em] text-gray-400 sm:block">Everyday, considered</span>
               </span>
             </Link>
+            <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+              {Menu.map((item) => (
+                <Link
+                  key={item.id}
+                  to={item.link}
+                  className="rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-600 transition hover:bg-primary/10 hover:text-secondary dark:text-gray-300 dark:hover:text-primary"
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
           </div>
-          {/* search and controls bar  */}
-          <div
-            className="flex justify-end
-          items-center gap-2 sm:gap-3 flex-1"
-          >
-            {/* search icon for small devices */}
-            <button className="sm:hidden text-gray-900 dark:text-white hover:text-primary transition-colors flex-shrink-0">
-              <IoMdSearch className="text-xl" />
-            </button>
-
-            <div
-              className="group relative hidden
-                 sm:block"
-            >
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-[150px] md:w-[200px]
-             group-hover:w-[250px] md:group-hover:w-[300px] transition-all duration-300
-             rounded-full border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:border-1
-              focus:border-primary
-              dark:border-gray-500
-              dark:bg-gray-800"
-              />
-              <IoMdSearch
-                className="text-gray-500 
-            group-hover:text-primary absolute
-            top-1/2 -translate-y-1/2 right-3 text-sm"
-              />
-            </div>
-            {/* order button */}
+          <div className="flex shrink-0 items-center justify-end gap-1.5 sm:gap-3">
             <button
               type="button"
               onClick={() => navigate("/cart")}
-              className="relative bg-gradient-to-r from-primary to-secondary transition-all duration-200
-             text-white py-1 px-2 sm:px-4 rounded-full flex
-             items-center gap-2 sm:gap-3 group flex-shrink-0"
+              aria-label={`Shopping bag${cartCount > 0 ? `, ${cartCount} items` : ""}`}
+              className="group relative inline-flex h-10 items-center justify-center gap-2 rounded-full border border-[#b99467]/25 bg-[#fbf9f5] px-3 text-[#514332] transition hover:border-primary hover:bg-primary/10 hover:text-secondary sm:px-4 dark:border-white/10 dark:bg-white/5 dark:text-white"
             >
-              <span className="transition-all duration-200 text-xs font-bold sm:text-sm">
-                Cart
-              </span>
+              <FaCartShopping className="text-[15px] transition-transform group-hover:-rotate-6 sm:text-base" />
+              <span className="hidden text-[10px] font-semibold uppercase tracking-[0.14em] sm:inline">Bag</span>
 
-              <FaCartShopping className="text-lg sm:text-xl text-white drop-shadow-sm" />
-
-              {/* Cart item count */}
               {cartCount > 0 && (
                 <span
-                  className="absolute -right-1 -top-2 flex h-5 min-w-5
-      items-center justify-center rounded-full bg-red-500
-      px-1 text-[10px] font-bold text-white"
+                  className="absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary px-1 text-[9px] font-bold text-white shadow-sm"
                 >
                   {cartCount}
                 </span>
               )}
             </button>
-            <div className="relative flex-shrink-0">
+            <div className="relative shrink-0">
               <button
                 type="button"
                 onClick={() => setIsAccountMenuOpen((prev) => !prev)}
-                className="rounded-full bg-gray-900 px-2 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-primary dark:bg-white dark:text-gray-900 whitespace-nowrap"
+                aria-label={isAuthenticated ? `Account menu for ${user?.name || "you"}` : "Account menu"}
+                aria-haspopup="true"
+                aria-expanded={isAccountMenuOpen}
+                className="flex h-10 items-center gap-2 rounded-full border border-[#b99467]/25 px-2.5 text-xs font-semibold text-[#514332] transition hover:border-primary hover:bg-primary/10 hover:text-secondary sm:px-3 dark:border-white/10 dark:text-white"
               >
-                <span className="hidden sm:inline">
-                  {isAuthenticated ? user?.name || "Account" : "Account"}
-                </span>
-                <span className="sm:hidden">
-                  {isAuthenticated ? "U" : "A/C"}
-                </span>
+                <FiUser size={15} />
+                <span className="hidden max-w-[100px] truncate sm:inline">{isAuthenticated ? user?.name || "Account" : "Account"}</span>
+                <FiChevronDown className={`hidden transition-transform sm:block ${isAccountMenuOpen ? "rotate-180" : ""}`} size={13} />
               </button>
 
               {isAccountMenuOpen && (
-                <div className="absolute right-0 z-[10000] mt-2 w-40 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-700">
+                <div className="absolute right-0 z-[10000] mt-3 w-56 overflow-hidden rounded-2xl border border-[#b99467]/20 bg-[#fffefa] py-1 shadow-[0_18px_50px_rgba(55,35,20,0.18)] dark:border-white/10 dark:bg-gray-900">
                   {isAuthenticated ? (
                     <>
                       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
@@ -283,6 +258,10 @@ const Navbar = () => {
                           setIsAccountMenuOpen(false);
                           // Dispatch logout event to update other components
                           window.dispatchEvent(new Event("user-logout"));
+                          navigate("/", {
+                            replace: true,
+                            state: { logoutSuccess: true },
+                          });
                         }}
                         className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 transition hover:bg-red-50 hover:text-red-600 dark:text-gray-200 dark:hover:bg-red-900/20 dark:hover:text-red-400 flex items-center gap-2"
                       >
@@ -317,13 +296,41 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            {/* dark mode switch */}
-            <div>
+            <div className="hidden lg:block">
               <DarkMode />
             </div>
           </div>
         </div>
-      </div>
+        {isMobileMenuOpen && (
+          <div
+            id="mobile-navigation"
+            className="border-t border-[#b99467]/15 pb-5 pt-3 lg:hidden"
+          >
+            <nav className="flex flex-col" aria-label="Mobile navigation">
+              {Menu.map((item, index) => (
+                <Link
+                  key={item.id}
+                  to={item.link}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center justify-between px-3 py-3.5 text-sm font-semibold text-gray-800 transition hover:text-secondary dark:text-gray-100 ${
+                    index < Menu.length - 1 ? "border-b border-black/[0.05] dark:border-white/[0.06]" : ""
+                  }`}
+                >
+                  {item.name}
+                  <span className="text-primary" aria-hidden="true">↗</span>
+                </Link>
+              ))}
+            </nav>
+            <div className="mt-3 flex items-center justify-between rounded-xl bg-[#f7f1e8] px-4 py-3 dark:bg-white/5">
+              <span>
+                <span className="block text-xs font-semibold text-gray-800 dark:text-white">Appearance</span>
+                <span className="mt-0.5 block text-[10px] text-gray-500 dark:text-gray-400">Choose your preferred theme</span>
+              </span>
+              <DarkMode />
+            </div>
+          </div>
+        )}
+      </header>
       {isOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
@@ -413,59 +420,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* lower navbar */}
-      <div className="flex justify-center">
-        <ul className="sm:flex hidden items-center gap-2">
-          {Menu.map((data) => (
-            <li key={data.id}>
-              <a
-                href={data.link}
-                className="inline-block rounded-full px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.22em] text-gray-700 transition-all duration-200 hover:bg-primary/10 hover:text-primary dark:text-gray-200"
-              >
-                {data.name}
-              </a>
-            </li>
-          ))}
-          {/* simple  dropdown and links*/}
-          <li
-            className="group relative 
-          cursor-pointer"
-          >
-            <a
-              href="#"
-              className="flex items-center gap-[2px] py-2 text-sm font-semibold uppercase tracking-[0.22em] text-gray-700 transition-all duration-200 hover:text-primary dark:text-gray-200"
-            >
-              Trending products
-              <span>
-                <FaCaretDown
-                  className="transition-all
-                duration-200
-                group-hover:rotate-180"
-                />
-              </span>
-            </a>
-            <div
-              className=" absolute z-[9999]
-            hidden 
-            group-hover:block w-[150px] rounded-md
-            bg-white p-2 text-black shadow-md"
-            >
-              <ul>
-                {DropdownLinks.map((data) => (
-                  <li key={data.id}>
-                    <a
-                      href={data.link}
-                      className="inline-block w-full rounded-md p-2 text-sm font-medium uppercase tracking-[0.18em] text-gray-700 hover:bg-primary/20 hover:text-primary dark:text-gray-800"
-                    >
-                      {data.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </li>
-        </ul>
-      </div>
     </div>
   );
 };

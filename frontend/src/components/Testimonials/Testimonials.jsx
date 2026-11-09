@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FaQuoteLeft, FaStar } from "react-icons/fa6";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaQuoteLeft,
+  FaStar,
+} from "react-icons/fa6";
 
 const TestimonialsData = [
   {
@@ -50,33 +55,36 @@ const Testimonials = () => {
   };
 
   return (
-    <section className="bg-[#fcfaf7] py-12 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-white sm:py-16">
-      <div className="mx-auto max-w-5xl px-4">
-        <div className="mb-8 text-center">
-          <p
-            data-aos="fade-up"
-            className="text-sm font-semibold uppercase tracking-[0.3em] text-primary"
-          >
-            Customer reviews
-          </p>
-          <h2
-            data-aos="fade-up"
-            className="text-3xl font-bold text-gray-900 dark:text-white"
-          >
-            Testimonials
-          </h2>
-        </div>
+    <section className="bg-[#29241e] py-8 text-[#f3eee6] transition-colors duration-300 dark:bg-[#171511] sm:py-12">
+      <div className="container max-w-[1440px] px-4 sm:px-8 lg:px-12">
+        <header className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#c6a77d] sm:text-xs">
+              <span className="h-px w-8 bg-current" aria-hidden="true" />
+              Customer reviews
+            </p>
+            <h2 className="mt-3 font-serif text-2xl font-normal leading-tight sm:text-4xl">
+              Testimonials
+            </h2>
+          </div>
 
-        <div className="relative overflow-hidden rounded-[32px] border border-orange-100 bg-[linear-gradient(135deg,rgba(255,255,255,0.95),rgba(255,247,237,0.92))] p-4 shadow-[0_25px_80px_-28px_rgba(0,0,0,0.45)] backdrop-blur-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(17,24,39,0.95),rgba(31,41,55,0.92))] sm:p-6">
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              {TestimonialsData.map((_, index) => (
-                <span
-                  key={index}
-                  className={`h-2 rounded-full transition-all duration-300 ${
+          <div className="flex items-center justify-between gap-5 sm:justify-end">
+            <div
+              className="flex items-center gap-2"
+              role="group"
+              aria-label="Choose a testimonial"
+            >
+              {TestimonialsData.map((item, index) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveIndex(index)}
+                  aria-label={`Show testimonial ${index + 1}`}
+                  aria-current={index === activeIndex ? "true" : undefined}
+                  className={`h-2 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#c6a77d] ${
                     index === activeIndex
-                      ? "w-8 bg-primary"
-                      : "w-2 bg-orange-200 dark:bg-orange-800"
+                      ? "w-8 bg-[#c6a77d]"
+                      : "w-2 bg-white/30 hover:bg-white/60"
                   }`}
                 />
               ))}
@@ -84,64 +92,74 @@ const Testimonials = () => {
 
             <div className="flex gap-2">
               <button
+                type="button"
                 onClick={prevSlide}
-                className="rounded-full border border-orange-200 bg-white px-3 py-1 text-sm font-semibold text-gray-700 transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-gray-900 dark:text-gray-200"
+                aria-label="Previous testimonial"
+                className="flex h-10 w-10 items-center justify-center border border-white/25 text-[#f3eee6] transition-colors hover:border-[#c6a77d] hover:text-[#c6a77d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c6a77d]"
               >
-                Prev
+                <FaChevronLeft aria-hidden="true" size={13} />
               </button>
               <button
+                type="button"
                 onClick={nextSlide}
-                className="rounded-full bg-gradient-to-r from-primary to-secondary px-3 py-1 text-sm font-semibold text-white shadow-lg shadow-orange-900/20 transition hover:scale-[1.02]"
+                aria-label="Next testimonial"
+                className="flex h-10 w-10 items-center justify-center border border-white/25 text-[#f3eee6] transition-colors hover:border-[#c6a77d] hover:text-[#c6a77d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c6a77d]"
               >
-                Next
+                <FaChevronRight aria-hidden="true" size={13} />
               </button>
             </div>
           </div>
+        </header>
 
-          <div className="overflow-hidden">
-            <div
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-            >
-              {TestimonialsData.map((item) => (
-                <div
-                  key={item.id}
-                  className="min-w-full px-1"
-                  data-aos="fade-up"
-                >
-                  <div className="rounded-[28px] border border-orange-100 bg-white p-5 shadow-[0_12px_30px_-18px_rgba(0,0,0,0.35)] dark:border-white/10 dark:bg-gray-900 dark:shadow-black/30">
-                    <div className="mb-4 flex items-center justify-between">
-                      <FaQuoteLeft className="text-2xl text-primary" />
-                      <div className="flex items-center gap-1 text-sm text-yellow-400">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <FaStar
-                            key={index}
-                            className={
-                              index < Math.round(item.rating)
-                                ? "opacity-100"
-                                : "opacity-30"
-                            }
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    <p className="mb-5 text-sm leading-6 text-gray-600 dark:text-gray-300">
-                      “{item.quote}”
-                    </p>
-
-                    <div>
-                      <h3 className="font-semibold text-gray-900 dark:text-white">
-                        {item.name}
-                      </h3>
-                      <p className="text-xs uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400">
-                        {item.role}
-                      </p>
+        <div className="overflow-hidden border-y border-[#c6a77d]/30">
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+          >
+            {TestimonialsData.map((item) => (
+              <div
+                key={item.id}
+                className="min-w-full px-1 py-6 sm:px-8 sm:py-8"
+              >
+                <div className="mx-auto max-w-3xl">
+                  <div className="flex items-center justify-between">
+                    <FaQuoteLeft
+                      className="text-xl text-[#c6a77d]"
+                      aria-hidden="true"
+                    />
+                    <div
+                      className="flex items-center gap-1 text-xs text-[#c6a77d]"
+                      aria-label={`${item.rating} out of 5 stars`}
+                    >
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <FaStar
+                          key={index}
+                          className={
+                            index < Math.round(item.rating)
+                              ? "opacity-100"
+                              : "opacity-30"
+                          }
+                          aria-hidden="true"
+                        />
+                      ))}
                     </div>
                   </div>
+
+                  <p className="mt-4 font-serif text-xl leading-snug text-[#f3eee6] sm:text-3xl sm:leading-snug">
+                    “{item.quote}”
+                  </p>
+
+                  <div className="mt-6 border-t border-white/15 pt-4">
+                    <h3 className="text-sm font-semibold text-white">
+                      {item.name}
+                    </h3>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[#c6a77d]">
+                      {item.role}
+                    </p>
+                  </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

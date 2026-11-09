@@ -1,6 +1,6 @@
 import React from "react";
-import LightButton from "../../assets/website/light-button.png";
-import DarkButton from "../../assets/website/dark-button.png";
+import { FiMoon, FiSun } from "react-icons/fi";
+
 const DarkMode = () => {
   const [theme, setTheme] = React.useState(
     () => localStorage.getItem("theme") || "light",
@@ -27,26 +27,15 @@ const DarkMode = () => {
   };
 
   return (
-    <div className="relative">
-      <img
-        src={LightButton}
-        alt=""
-        onClick={toggleTheme}
-        className={`w-12 sm:w-10 cursor-pointer
-       drop-shadow-[1px_1px_1px_rgba(0,0,0,1)] transition-all
-       duration-300 absolute right-0 z-10 ${
-         theme === "dark" ? "opacity-0" : "opacity-100"
-       } `}
-      />
-      <img
-        src={DarkButton}
-        alt=""
-        onClick={toggleTheme}
-        className="w-12 sm:w-10 cursor-pointer
-       drop-shadow-[1px_1px_1px_rgba(0,0,0,1)] transition-all
-       duration-300 "
-      />
-    </div>
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      aria-pressed={theme === "dark"}
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-[#b99467]/25 bg-[#fbf9f5] text-[#9b754b] transition hover:border-primary hover:bg-primary/10 hover:text-secondary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:border-white/10 dark:bg-white/5 dark:text-[#d4ad7e]"
+    >
+      {theme === "light" ? <FiMoon size={16} /> : <FiSun size={16} />}
+    </button>
   );
 };
 

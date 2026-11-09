@@ -33,33 +33,38 @@ const ProductsPage = () => {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#fcfaf7] py-10 dark:bg-gray-950 sm:py-16">
-      <div className="container px-3 sm:px-0">
-        <header className="mx-auto mb-8 max-w-[600px] text-center sm:mb-12">
-          <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary">
-            OUR SHOP'S TOUCH
-          </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-gray-900 dark:text-white sm:text-5xl">
-            All products
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-gray-500 dark:text-gray-400">
-            Explore every piece in our collection.
-          </p>
+    <main className="min-h-screen bg-[#f7f4ef] py-9 text-[#29241e] dark:bg-[#171511] dark:text-[#f3eee6] sm:py-16">
+      <div className="container max-w-[1440px] px-4 sm:px-8 lg:px-12">
+        <header className="mb-8 border-b border-[#b99467]/25 pb-7 sm:mb-10 sm:flex sm:items-end sm:justify-between sm:pb-9">
+          <div>
+            <p className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#927650] dark:text-[#c6a77d] sm:text-xs">
+              <span className="h-px w-8 bg-current" aria-hidden="true" />
+              G&B / The collection
+            </p>
+            <h1 className="mt-3 font-serif text-4xl font-normal leading-none sm:mt-4 sm:text-6xl">
+              All pieces
+            </h1>
+            <p className="mt-3 max-w-md text-xs leading-6 text-[#71685e] dark:text-[#c4bbb0] sm:text-sm">
+              Considered essentials, chosen to be worn on repeat.
+            </p>
+          </div>
+          {!loading && !error && products.length > 0 && (
+            <p className="mt-5 text-[10px] font-medium uppercase tracking-[0.18em] text-[#8c8173] dark:text-[#b8ad9f] sm:mb-1 sm:mt-0">
+              {products.length} {products.length === 1 ? "piece" : "pieces"}
+            </p>
+          )}
         </header>
 
         {loading && (
           <div
             role="status"
             aria-label="Loading products"
-            className="grid grid-cols-2 gap-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
+            className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-7"
           >
             {Array.from({ length: 8 }, (_, index) => (
-              <div
-                key={index}
-                className="overflow-hidden rounded-[1.35rem] border border-black/[0.06] bg-white p-3 shadow-[0_12px_35px_rgba(55,35,20,0.07)] dark:border-white/10 dark:bg-gray-900"
-              >
-                <Skeleton className="h-[150px] w-full rounded-[1rem] sm:h-[275px]" />
-                <div className="space-y-2 px-1 pb-1 pt-3 sm:pt-4">
+              <div key={index} className="overflow-hidden">
+                <Skeleton className="aspect-[4/5] w-full rounded-none" />
+                <div className="space-y-2 pt-3 sm:pt-4">
                   <Skeleton className="h-2 w-1/3 sm:h-3" />
                   <Skeleton className="h-4 w-3/4 sm:h-5" />
                   <div className="flex justify-between gap-2">
@@ -81,40 +86,41 @@ const ProductsPage = () => {
         )}
 
         {!loading && !error && products.length === 0 && (
-          <p className="py-10 text-center text-gray-500 dark:text-gray-400">
+          <p className="py-20 text-center font-serif text-2xl text-[#71685e] dark:text-[#c4bbb0]">
             No products are available right now.
           </p>
         )}
 
         {!loading && !error && products.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-7">
             {products.map((product) => (
               <Link
                 to={`/product/${product._id}`}
                 key={product._id}
-                className="group block overflow-hidden rounded-[1.35rem] border border-black/[0.06] bg-white p-3 shadow-[0_12px_35px_rgba(55,35,20,0.07)] transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(55,35,20,0.14)] dark:border-white/10 dark:bg-gray-900"
+                className="group block min-w-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#927650]"
               >
-                <div className="overflow-hidden rounded-[1rem] bg-[#f2ece4] dark:bg-gray-800">
+                <div className="relative aspect-[4/5] overflow-hidden bg-[#eee7dd] dark:bg-[#29251f]">
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="h-[150px] w-full object-cover transition duration-700 ease-out group-hover:scale-105 sm:h-[275px]"
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
                   />
                 </div>
-                <div className="px-1 pb-1 pt-2 sm:pt-4">
-                  <p className="mb-1 text-[7px] font-bold uppercase tracking-[0.16em] text-gray-400 sm:mb-2 sm:text-[10px]">
+                <div className="pt-3 sm:pt-4">
+                  <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#927650] dark:text-[#c6a77d] sm:mb-2 sm:text-[10px]">
                     {product.category}
                   </p>
-                  <h2 className="truncate text-xs font-bold text-gray-900 dark:text-white sm:text-base">
+                  <h2 className="truncate text-sm font-medium text-[#29241e] transition-colors group-hover:text-[#806545] dark:text-[#f3eee6] dark:group-hover:text-[#d4b68f] sm:text-base">
                     {product.name}
                   </h2>
-                  <div className="mt-1 flex items-center justify-between gap-1">
-                    <p className="text-[8px] text-gray-500 dark:text-gray-400 sm:text-xs">
+                  <div className="mt-2 flex items-center justify-between gap-2 border-t border-[#b99467]/20 pt-2.5 sm:mt-3 sm:pt-3">
+                    <p className="text-[9px] text-[#8c8173] dark:text-[#b8ad9f] sm:text-[11px]">
                       {product.stock > 0
                         ? `${product.stock} in stock`
                         : "Out of Stock"}
                     </p>
-                    <span className="text-xs font-black text-gray-900 dark:text-white sm:text-sm">
+                    <span className="shrink-0 text-xs font-semibold tabular-nums text-[#29241e] dark:text-[#f3eee6] sm:text-sm">
                       {product.price.toLocaleString()} Rwf
                     </span>
                   </div>

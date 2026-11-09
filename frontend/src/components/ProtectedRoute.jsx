@@ -1,10 +1,11 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import Skeleton from "./Skeleton";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -24,7 +25,13 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/#login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location, requiresAuth: true }}
+      />
+    );
   }
 
   return children;

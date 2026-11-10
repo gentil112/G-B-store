@@ -1,140 +1,112 @@
-import React, { useState, useEffect } from "react";
-import Skeleton from "../components/Skeleton";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import Footer from "../components/Footer/Footer";
+import Navbar from "../components/navbar/Navbar";
 import { API_BASE_URL } from "../config/api";
+import { useAuth } from "../context/AuthContext";
+
+const emptyPasswordFields = {
+  currentPassword: "",
+  password: "",
+  confirmPassword: "",
+};
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({
-    name: "",
-    email: "",
-    currentPassword: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [message, setMessage] = useState("");
+  const { user, token, login } = useAuth();
+  const [profile, setProfile] = useState(() => ({
+    name: user?.name || "",
+    email: user?.email || "",
+  }));
+  const [passwords, setPasswords] = useState(emptyPasswordFields);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [notice, setNotice] = useState(null);
 
-  useEffect(() => {
-    const loadUser = () => {
-      const userData = localStorage.getItem("user");
-      if (userData) {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        setEditData({
-          name: parsedUser.name || "",
-          email: parsedUser.email || "",
-          currentPassword: "",
-          password: "",
-          confirmPassword: "",
-        });
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    };
-
-    loadUser();
-
-    // Listen for logout event from navbar
-    const handleLogoutEvent = () => {
-      setUser(null);
-      setMessage("");
-    };
-
-    window.addEventListener("user-logout", handleLogoutEvent);
-    return () => window.removeEventListener("user-logout", handleLogoutEvent);
-  }, []);
-
-  const handleEditChange = (e) => {
-    setEditData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
+  const handleProfileChange = (event) => {
+    setProfile((current) => ({
+      ...current,
+      [event.target.name]: event.target.value,
     }));
   };
 
-  const handleSaveProfile = async () => {
-    try {
-      const token =
-        localStorage.getItem("authToken") || localStorage.getItem("token");
-      if (!token) {
-        setMessage("No token found. Please login again.");
-        return;
+  const handlePasswordChange = (event) => {
+    setPasswords((current) => ({
+      ...current,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  const readResponse = async (response) => {
+    const text = await response.text();
+    let data = {};
+
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(
+          "The server returned an invalid response. Please try again later.",
+        );
       }
+    }
 
-      const payload = {
-        name: editData.name,
-        email: editData.email,
-      };
+    if (!response.ok) {
+      throw new Error(data.message || "The request could not be completed.");
+    }
 
+    return data;
+  };
+
+  const handleSaveProfile = async (event) => {
+    event.preventDefault();
+    setNotice(null);
+    setIsSavingProfile(true);
+
+    try {
       const response = await fetch(`${API_BASE_URL}/auth/update-profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(profile),
       });
+      const data = await readResponse(response);
 
-      const text = await response.text();
-      let data = {};
+      if (!data.user) throw new Error("The updated profile was not returned.");
 
-      if (text) {
-        try {
-          data = JSON.parse(text);
-        } catch (error) {
-          throw new Error(
-            "The server returned an invalid response. Please make sure the backend is running.",
-          );
-        }
-      }
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to update profile");
-      }
-
-      localStorage.setItem("user", JSON.stringify(data.user));
-      setUser(data.user);
-      setEditData({
-        name: data.user.name || "",
-        email: data.user.email || "",
-        currentPassword: "",
-        password: "",
-        confirmPassword: "",
-      });
-      setIsEditing(false);
-      setMessage("Profile updated successfully!");
-      setTimeout(() => setMessage(""), 3000);
+      const updatedUser = { ...user, ...data.user };
+      login(updatedUser, token);
+      setProfile({ name: updatedUser.name || "", email: updatedUser.email || "" });
+      setNotice({ type: "success", text: "Profile updated successfully." });
     } catch (error) {
       console.error("Profile update error:", error);
-      setMessage(error.message);
+      setNotice({ type: "error", text: error.message });
+    } finally {
+      setIsSavingProfile(false);
     }
   };
 
-  const handleChangePassword = async () => {
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
+    setNotice(null);
+
+    if (passwords.password.length < 6) {
+      setNotice({
+        type: "error",
+        text: "New password must be at least 6 characters long.",
+      });
+      return;
+    }
+
+    if (passwords.password !== passwords.confirmPassword) {
+      setNotice({ type: "error", text: "New passwords do not match." });
+      return;
+    }
+
+    setIsChangingPassword(true);
+
     try {
-      const token =
-        localStorage.getItem("authToken") || localStorage.getItem("token");
-      if (!token) {
-        setMessage("No token found. Please login again.");
-        return;
-      }
-
-      if (!editData.password.trim()) {
-        setMessage("Please enter your new password.");
-        return;
-      }
-
-      if (editData.password.length < 6) {
-        setMessage("New password must be at least 6 characters long.");
-        return;
-      }
-
-      if (editData.password !== editData.confirmPassword) {
-        setMessage("New passwords do not match.");
-        return;
-      }
-
       const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
         method: "PUT",
         headers: {
@@ -142,353 +114,222 @@ const ProfilePage = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          currentPassword: editData.currentPassword,
-          password: editData.password,
+          currentPassword: passwords.currentPassword,
+          password: passwords.password,
         }),
       });
-
-      const text = await response.text();
-      let data = {};
-
-      if (text) {
-        try {
-          data = JSON.parse(text);
-        } catch (error) {
-          throw new Error(
-            "The server returned an invalid response. Please make sure the backend is running.",
-          );
-        }
-      }
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to change password");
-      }
-
-      setEditData({
-        name: user.name || "",
-        email: user.email || "",
-        currentPassword: "",
-        password: "",
-        confirmPassword: "",
+      const data = await readResponse(response);
+      setPasswords(emptyPasswordFields);
+      setNotice({
+        type: "success",
+        text: data.message || "Password changed successfully.",
       });
-      setMessage("Password changed successfully!");
-      setTimeout(() => setMessage(""), 3000);
     } catch (error) {
       console.error("Password change error:", error);
-      setMessage(error.message);
+      setNotice({ type: "error", text: error.message });
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 px-4 py-10 dark:bg-gray-950">
-        <div
-          role="status"
-          aria-label="Loading profile"
-          className="mx-auto max-w-2xl"
-        >
-          <Skeleton className="mb-8 h-12 w-full rounded-full" />
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-700 dark:bg-gray-900 sm:p-8">
-            <Skeleton className="h-8 w-2/5" />
-            <div className="mt-8 space-y-6">
-              <Skeleton className="h-12 w-full rounded-xl" />
-              <Skeleton className="h-12 w-full rounded-xl" />
-              <Skeleton className="h-12 w-full rounded-xl" />
-              <Skeleton className="h-12 w-36 rounded-full" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 dark:bg-gray-950">
-        <div className="text-center rounded-3xl border border-gray-200 bg-white p-8 shadow-xl dark:border-gray-700 dark:bg-gray-900">
-          <h1 className="mb-4 text-2xl font-black text-gray-900 dark:text-white">
-            Not Logged In
-          </h1>
-          <p className="mb-6 text-gray-600 dark:text-gray-300">
-            Please login to view your profile.
-          </p>
-          <button
-            onClick={() => {
-              window.location.hash = "login";
-            }}
-            className="rounded-full bg-primary px-6 py-3 font-semibold text-white transition hover:bg-secondary"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-10 dark:bg-gray-950">
-      <div className="mx-auto max-w-2xl">
-        {/* HEADER */}
-        <div className="mb-8">
-          <button
-            onClick={() => {
-              window.location.hash = "";
-            }}
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary px-6 py-3.5 font-bold text-white shadow-lg shadow-primary/30 transition duration-200 hover:scale-[1.02] hover:shadow-xl hover:shadow-secondary/30"
-          >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back to Home
-          </button>
-        </div>
-
-        {/* PROFILE CARD */}
-        <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-xl dark:border-gray-700 dark:bg-gray-900">
-          {/* AVATAR AND USER INFO */}
-          <div className="mb-8 flex flex-col items-center gap-6">
-            {/* AVATAR */}
-            <div className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary shadow-lg">
-              <span className="text-4xl font-black text-white">
-                {user.name
-                  ?.split(" ")
-                  .map((n) => n[0])
-                  .join("")
-                  .toUpperCase()
-                  .slice(0, 2) || "U"}
-              </span>
-            </div>
-
-            {/* NAME AND EMAIL */}
-            <div className="text-center">
-              <h1 className="text-3xl font-black text-gray-900 dark:text-white">
-                {user.name || "User"}
+    <>
+      <Navbar />
+      <main className="min-h-[60vh] bg-[#f7f4ef] px-4 py-10 text-[#29241e] dark:bg-[#171511] dark:text-[#f3eee6] sm:py-16">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-9 flex flex-wrap items-end justify-between gap-5 border-b border-[#b99467]/25 pb-7 sm:mb-11 sm:pb-9">
+            <div>
+              <p className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#927650] dark:text-[#c6a77d] sm:text-xs">
+                <span className="h-px w-8 bg-current" aria-hidden="true" />
+                G&amp;B / Member account
+              </p>
+              <h1 className="mt-3 font-serif text-4xl font-normal leading-none tracking-tight text-[#29241e] dark:text-[#f3eee6] sm:mt-4 sm:text-6xl">
+                Profile
               </h1>
-              <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
-                {user.email}
+              <p className="mt-3 max-w-lg text-sm leading-6 text-[#71685e] dark:text-[#c4bbb0]">
+                Manage your account details and password.
               </p>
             </div>
+            <Link
+              to="/my-orders"
+              className="border border-[#b99467]/45 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#514332] transition-colors hover:border-[#927650] hover:bg-[#927650] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#927650] dark:border-[#c6a77d]/35 dark:text-[#e8d8c3] dark:hover:bg-[#c6a77d] dark:hover:text-[#29241e]"
+            >
+              View my orders
+            </Link>
           </div>
 
-          {/* DIVIDER */}
-          <div className="mb-8 h-px bg-gray-200 dark:bg-gray-700" />
-
-          {/* PROFILE INFO SECTION */}
-          {!isEditing ? (
-            <div className="space-y-6">
-              {/* USER ID */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  User ID
-                </label>
-                <p className="mt-2 rounded-lg bg-gray-50 px-4 py-3 font-mono text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                  {user.id || "N/A"}
+          <section className="border border-[#b99467]/25 bg-[#fffefa] p-5 dark:border-white/10 dark:bg-[#211e1a] sm:p-9">
+            <div className="mb-8 flex flex-wrap items-center justify-between gap-5 border-b border-[#b99467]/20 pb-7 dark:border-white/10 sm:mb-10">
+              <div className="flex min-w-0 items-center gap-4 sm:gap-5">
+              <div
+                aria-hidden="true"
+                className="flex h-16 w-16 shrink-0 items-center justify-center border border-[#b99467]/45 bg-[#f7f1e8] font-serif text-sm tracking-[0.08em] text-[#765b3c] dark:border-[#c6a77d]/35 dark:bg-[#2b261f] dark:text-[#e2c6a2] sm:h-[76px] sm:w-[76px]"
+              >
+                G&amp;B
+              </div>
+              <div className="min-w-0">
+                <p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-[#927650] dark:text-[#c6a77d]">
+                  G&amp;B member
+                </p>
+                <h2 className="truncate font-serif text-2xl font-normal text-[#29241e] dark:text-[#f3eee6] sm:text-3xl">
+                  {user?.name || "Your account"}
+                </h2>
+                <p className="mt-1 truncate text-sm text-[#71685e] dark:text-[#c4bbb0]">
+                  {user?.email}
                 </p>
               </div>
-
-              {/* NAME */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  Full Name
-                </label>
-                <p className="mt-2 rounded-lg bg-gray-50 px-4 py-3 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                  {user.name || "Not set"}
-                </p>
               </div>
-
-              {/* EMAIL */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  Email Address
-                </label>
-                <p className="mt-2 rounded-lg bg-gray-50 px-4 py-3 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                  {user.email || "Not set"}
-                </p>
-              </div>
-
-              {/* MEMBER SINCE */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  Member Since
-                </label>
-                <p className="mt-2 rounded-lg bg-gray-50 px-4 py-3 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                  {new Date().toLocaleDateString()}
-                </p>
-              </div>
-
-              {/* BUTTONS */}
-              <div className="flex gap-4 pt-4">
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="w-full rounded-full bg-primary px-4 py-3 font-semibold text-white transition hover:bg-secondary"
-                >
-                  Edit Profile
-                </button>
-              </div>
+              <p className="text-[9px] font-medium uppercase tracking-[0.2em] text-[#8c8173] dark:text-[#b8ad9f]">
+                Account details
+              </p>
             </div>
-          ) : (
-            /* EDIT MODE */
-            <div className="space-y-6">
-              {/* NAME INPUT */}
+
+            <form onSubmit={handleSaveProfile} className="space-y-6">
+              <h2 className="font-serif text-2xl font-normal text-[#29241e] dark:text-[#f3eee6]">
+                Personal details
+              </h2>
+              <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
               <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  Full Name
+                <label
+                  htmlFor="profile-name"
+                  className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#71685e] dark:text-[#c4bbb0]"
+                >
+                  Full name
                 </label>
                 <input
-                  type="text"
+                  id="profile-name"
                   name="name"
-                  value={editData.name}
-                  onChange={handleEditChange}
-                  className="mt-2 w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-gray-900 outline-none transition focus:border-primary dark:border-gray-700 dark:text-white"
+                  value={profile.name}
+                  onChange={handleProfileChange}
+                  autoComplete="name"
+                  required
+                  className="mt-2 w-full border-0 border-b border-[#d6cec2] bg-transparent px-0 py-3 text-sm text-[#29241e] outline-none transition placeholder:text-[#a39a8f] focus:border-[#927650] focus:ring-0 dark:border-white/20 dark:text-white dark:focus:border-[#c6a77d]"
                 />
               </div>
-
-              {/* EMAIL INPUT */}
               <div>
-                <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                  Email Address
+                <label
+                  htmlFor="profile-email"
+                  className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#71685e] dark:text-[#c4bbb0]"
+                >
+                  Email address
                 </label>
                 <input
-                  type="email"
+                  id="profile-email"
                   name="email"
-                  value={editData.email}
-                  onChange={handleEditChange}
-                  className="mt-2 w-full rounded-xl border border-gray-300 bg-transparent px-4 py-3 text-gray-900 outline-none transition focus:border-primary dark:border-gray-700 dark:text-white"
+                  type="email"
+                  value={profile.email}
+                  onChange={handleProfileChange}
+                  autoComplete="email"
+                  required
+                  className="mt-2 w-full border-0 border-b border-[#d6cec2] bg-transparent px-0 py-3 text-sm text-[#29241e] outline-none transition placeholder:text-[#a39a8f] focus:border-[#927650] focus:ring-0 dark:border-white/20 dark:text-white dark:focus:border-[#c6a77d]"
                 />
               </div>
-
-              {/* BUTTONS */}
-              <div className="flex gap-4 pt-4">
-                <button
-                  onClick={handleSaveProfile}
-                  className="flex-1 rounded-full bg-primary px-4 py-3 font-semibold text-white transition hover:bg-secondary"
-                >
-                  Save Profile Details
-                </button>
-                <button
-                  onClick={() => {
-                    setIsEditing(false);
-                    setEditData({
-                      name: user.name || "",
-                      email: user.email || "",
-                      currentPassword: "",
-                      password: "",
-                      confirmPassword: "",
-                    });
-                  }}
-                  className="flex-1 rounded-full border-2 border-gray-300 px-4 py-3 font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-                >
-                  Cancel
-                </button>
               </div>
+              <button
+                type="submit"
+                disabled={isSavingProfile}
+                className="w-full bg-[#29241e] px-6 py-3.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:bg-[#514332] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#927650] disabled:cursor-wait disabled:opacity-60 dark:bg-[#eee7dc] dark:text-[#29241e] dark:hover:bg-white sm:w-auto"
+              >
+                {isSavingProfile ? "Saving…" : "Save changes"}
+              </button>
+            </form>
 
-              <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/60">
-                <h3 className="mb-4 text-lg font-bold text-gray-900 dark:text-white">
-                  Change Password
-                </h3>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                      Current Password (if you have one)
-                    </label>
-                    <input
-                      type="password"
-                      name="currentPassword"
-                      value={editData.currentPassword}
-                      onChange={handleEditChange}
-                      placeholder="Required for an existing password"
-                      className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                      New Password
-                    </label>
-                    <input
-                      type="password"
-                      name="password"
-                      value={editData.password}
-                      onChange={handleEditChange}
-                      placeholder="Enter a new password"
-                      className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-600 dark:text-gray-400">
-                      Confirm New Password
-                    </label>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={editData.confirmPassword}
-                      onChange={handleEditChange}
-                      placeholder="Confirm your new password"
-                      className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-primary dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleChangePassword}
-                    className="w-full rounded-full bg-gradient-to-r from-primary to-secondary px-4 py-3 font-semibold text-white shadow-md shadow-primary/20 transition hover:shadow-lg hover:shadow-secondary/30"
+            <form
+              onSubmit={handleChangePassword}
+              className="mt-10 space-y-6 border-t border-[#b99467]/20 pt-8 dark:border-white/10 sm:mt-12 sm:pt-10"
+            >
+              <div>
+                <h2 className="font-serif text-2xl font-normal text-[#29241e] dark:text-[#f3eee6]">
+                  Change password
+                </h2>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-[#71685e] dark:text-[#c4bbb0]">
+                  Google sign-in accounts can set a password without an existing one.
+                </p>
+              </div>
+              <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor="current-password"
+                  className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#71685e] dark:text-[#c4bbb0]"
+                >
+                  Current password
+                </label>
+                <input
+                  id="current-password"
+                  name="currentPassword"
+                  type="password"
+                  value={passwords.currentPassword}
+                  onChange={handlePasswordChange}
+                  autoComplete="current-password"
+                  className="mt-2 w-full border-0 border-b border-[#d6cec2] bg-transparent px-0 py-3 text-sm text-[#29241e] outline-none transition focus:border-[#927650] focus:ring-0 dark:border-white/20 dark:text-white dark:focus:border-[#c6a77d]"
+                />
+              </div>
+                <div>
+                  <label
+                    htmlFor="new-password"
+                    className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#71685e] dark:text-[#c4bbb0]"
                   >
-                    Change Password
-                  </button>
+                    New password
+                  </label>
+                  <input
+                    id="new-password"
+                    name="password"
+                    type="password"
+                    value={passwords.password}
+                    onChange={handlePasswordChange}
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
+                    className="mt-2 w-full border-0 border-b border-[#d6cec2] bg-transparent px-0 py-3 text-sm text-[#29241e] outline-none transition focus:border-[#927650] focus:ring-0 dark:border-white/20 dark:text-white dark:focus:border-[#c6a77d]"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="confirm-password"
+                    className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#71685e] dark:text-[#c4bbb0]"
+                  >
+                    Confirm new password
+                  </label>
+                  <input
+                    id="confirm-password"
+                    name="confirmPassword"
+                    type="password"
+                    value={passwords.confirmPassword}
+                    onChange={handlePasswordChange}
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
+                    className="mt-2 w-full border-0 border-b border-[#d6cec2] bg-transparent px-0 py-3 text-sm text-[#29241e] outline-none transition focus:border-[#927650] focus:ring-0 dark:border-white/20 dark:text-white dark:focus:border-[#c6a77d]"
+                  />
                 </div>
               </div>
-            </div>
-          )}
+              <button
+                type="submit"
+                disabled={isChangingPassword}
+                className="w-full border border-[#b99467]/45 px-6 py-3.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#514332] transition-colors hover:border-[#927650] hover:bg-[#927650] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#927650] disabled:cursor-wait disabled:opacity-60 dark:border-[#c6a77d]/35 dark:text-[#e8d8c3] dark:hover:bg-[#c6a77d] dark:hover:text-[#29241e] sm:w-auto"
+              >
+                {isChangingPassword ? "Updating…" : "Update password"}
+              </button>
+            </form>
 
-          {/* MESSAGE */}
-          {message && (
-            <div
-              className={`mt-6 rounded-lg px-4 py-3 text-center text-sm font-semibold ${
-                message.includes("successfully")
-                  ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                  : "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-              }`}
-            >
-              {message}
-            </div>
-          )}
+            {notice && (
+              <p
+                className={`mt-6 border px-4 py-3 text-sm font-medium ${
+                  notice.type === "success"
+                    ? "border-emerald-700/20 bg-emerald-50 text-emerald-800 dark:border-emerald-300/20 dark:bg-emerald-950/40 dark:text-emerald-200"
+                    : "border-red-300 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/50 dark:text-red-200"
+                }`}
+                role={notice.type === "error" ? "alert" : "status"}
+                aria-live="polite"
+              >
+                {notice.text}
+              </p>
+            )}
+          </section>
         </div>
-
-        {/* ACCOUNT STATS */}
-        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow dark:border-gray-700 dark:bg-gray-900">
-            <p className="text-2xl font-black text-primary">∞</p>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Products
-            </p>
-          </div>
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow dark:border-gray-700 dark:bg-gray-900">
-            <p className="text-2xl font-black text-secondary">0</p>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Orders
-            </p>
-          </div>
-          <div className="rounded-2xl border border-gray-200 bg-white p-6 text-center shadow dark:border-gray-700 dark:bg-gray-900">
-            <p className="text-2xl font-black text-green-500">✓</p>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Active
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
+      </main>
+      <Footer />
+    </>
   );
 };
 

@@ -81,7 +81,6 @@ const AppRoutes = () => {
   const currentPage = location.hash.replace("#", "") || "home";
   const isRegisterPage = currentPage === "register";
   const isLoginPage = currentPage === "login";
-  const isProfilePage = currentPage === "profile";
 
   React.useEffect(() => {
     AOS.init({
@@ -98,6 +97,14 @@ const AppRoutes = () => {
     <Routes>
           {/* Authentication page used by protected routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Cart page */}
           <Route path="/cart" element={<CartPage />} />
@@ -132,7 +139,7 @@ const AppRoutes = () => {
             path="*"
             element={
               <div>
-                {!isRegisterPage && !isLoginPage && !isProfilePage && (
+                {!isRegisterPage && !isLoginPage && (
                   <Navbar />
                 )}
 
@@ -140,8 +147,6 @@ const AppRoutes = () => {
                   <RegisterPage />
                 ) : isLoginPage ? (
                   <LoginPage />
-                ) : isProfilePage ? (
-                  <ProfilePage />
                 ) : (
                   <HomePage />
                 )}

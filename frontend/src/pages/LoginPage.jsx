@@ -21,14 +21,21 @@ const LoginPage = () => {
     if (!successMessage) return undefined;
 
     const timer = window.setTimeout(() => {
-      navigate("/", {
+      const returnTo = location.state?.from;
+      const destination = returnTo
+        ? `${returnTo.pathname || "/"}${returnTo.search || ""}${returnTo.hash || ""}`
+        : "/";
+
+      navigate(destination, {
         replace: true,
-        state: { loginSuccess: true, userName: authenticatedName },
+        state: returnTo
+          ? null
+          : { loginSuccess: true, userName: authenticatedName },
       });
     }, 900);
 
     return () => window.clearTimeout(timer);
-  }, [authenticatedName, navigate, successMessage]);
+  }, [authenticatedName, location.state, navigate, successMessage]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -69,7 +76,11 @@ const LoginPage = () => {
       }
 
       setAuthenticatedName(data.user?.name || "");
-      setSuccessMessage("Signed in successfully. Taking you home…");
+      setSuccessMessage(
+        location.state?.from
+          ? "Signed in successfully. Taking you back to your account…"
+          : "Signed in successfully. Taking you home…",
+      );
     } catch (error) {
       const isInvalidCredentials =
         error.message?.toLowerCase() === "invalid email or password";

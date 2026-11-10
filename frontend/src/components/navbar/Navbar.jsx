@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { FaCartShopping } from "react-icons/fa6";
-import { FiChevronDown, FiMenu, FiUser, FiX } from "react-icons/fi";
-import { MdLogout } from "react-icons/md";
+import {
+  FiChevronDown,
+  FiGrid,
+  FiLogOut,
+  FiMenu,
+  FiPackage,
+  FiUser,
+  FiX,
+} from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import DarkMode from "./DarkMode";
 import { useAuth } from "../../context/AuthContext";
@@ -193,14 +200,14 @@ const Navbar = () => {
               </button>
 
               {isAccountMenuOpen && (
-                <div className="absolute right-0 z-[10000] mt-3 w-56 overflow-hidden rounded-2xl border border-[#b99467]/20 bg-[#fffefa] py-1 shadow-[0_18px_50px_rgba(55,35,20,0.18)] dark:border-white/10 dark:bg-gray-900">
+                <div className="absolute right-0 z-[10000] mt-3 w-72 overflow-hidden border border-[#b99467]/30 bg-[#fffefa] py-2 shadow-[0_22px_60px_rgba(55,35,20,0.16)] dark:border-white/10 dark:bg-[#211e1a]">
                   {isAuthenticated ? (
                     <>
-                      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          Logged in as
+                      <div className="border-b border-[#b99467]/20 bg-[#f7f4ef] px-5 py-4 dark:border-white/10 dark:bg-[#29251f]">
+                        <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#927650] dark:text-[#c6a77d]">
+                          Member account
                         </p>
-                        <p className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                        <p className="mt-1 truncate font-serif text-lg text-[#29241e] dark:text-[#f3eee6]">
                           {user?.email}
                         </p>
                       </div>
@@ -210,9 +217,13 @@ const Navbar = () => {
                           setIsAccountMenuOpen(false);
                           navigate("/my-orders");
                         }}
-                        className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 transition hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-primary/10 dark:hover:text-primary"
+                        className="group flex w-full items-center gap-3 border-l-2 border-transparent px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.16em] text-[#514332] transition-colors hover:border-[#927650] hover:bg-[#f7f4ef] hover:text-[#765b3c] focus-visible:border-[#927650] focus-visible:bg-[#f7f4ef] focus-visible:outline-none dark:text-[#e8d8c3] dark:hover:bg-white/[0.04] dark:hover:text-[#e2c6a2] dark:focus-visible:bg-white/[0.04]"
                       >
-                        My Orders
+                        <FiPackage
+                          className="shrink-0 text-base text-[#927650] dark:text-[#c6a77d]"
+                          aria-hidden="true"
+                        />
+                        <span>My orders</span>
                       </button>
                       {user?.role === "admin" && (
                         <button
@@ -221,35 +232,28 @@ const Navbar = () => {
                             setIsAccountMenuOpen(false);
                             navigate("/admin");
                           }}
-                          className="block w-full px-4 py-2 text-left text-sm font-bold text-primary transition hover:bg-primary/10"
+                          className="group flex w-full items-center gap-3 border-l-2 border-transparent px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.16em] text-[#514332] transition-colors hover:border-[#927650] hover:bg-[#f7f4ef] hover:text-[#765b3c] focus-visible:border-[#927650] focus-visible:bg-[#f7f4ef] focus-visible:outline-none dark:text-[#e8d8c3] dark:hover:bg-white/[0.04] dark:hover:text-[#e2c6a2] dark:focus-visible:bg-white/[0.04]"
                         >
-                          Admin Dashboard
+                          <FiGrid
+                            className="shrink-0 text-base text-[#927650] dark:text-[#c6a77d]"
+                            aria-hidden="true"
+                          />
+                          <span>Admin dashboard</span>
                         </button>
                       )}
                       <button
                         type="button"
                         onClick={() => {
                           setIsAccountMenuOpen(false);
-                          window.location.hash = "profile";
+                          navigate("/profile");
                         }}
-                        className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 transition hover:bg-primary/10 hover:text-primary dark:text-gray-200 dark:hover:bg-primary/10 dark:hover:text-primary flex items-center gap-2"
+                        className="group flex w-full items-center gap-3 border-l-2 border-transparent px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.16em] text-[#514332] transition-colors hover:border-[#927650] hover:bg-[#f7f4ef] hover:text-[#765b3c] focus-visible:border-[#927650] focus-visible:bg-[#f7f4ef] focus-visible:outline-none dark:text-[#e8d8c3] dark:hover:bg-white/[0.04] dark:hover:text-[#e2c6a2] dark:focus-visible:bg-white/[0.04]"
                       >
-                        <svg
-                          className="text-lg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          width="20"
-                          height="20"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        View Profile
+                        <FiUser
+                          className="shrink-0 text-base text-[#927650] dark:text-[#c6a77d]"
+                          aria-hidden="true"
+                        />
+                        <span>View profile</span>
                       </button>
                       <button
                         type="button"
@@ -263,10 +267,13 @@ const Navbar = () => {
                             state: { logoutSuccess: true },
                           });
                         }}
-                        className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 transition hover:bg-red-50 hover:text-red-600 dark:text-gray-200 dark:hover:bg-red-900/20 dark:hover:text-red-400 flex items-center gap-2"
+                        className="group mt-1 flex w-full items-center gap-3 border-t border-[#b99467]/20 border-l-2 border-l-transparent px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.16em] text-[#71685e] transition-colors hover:border-l-[#9c5145] hover:bg-[#f8f0ed] hover:text-[#8d4035] focus-visible:border-l-[#9c5145] focus-visible:bg-[#f8f0ed] focus-visible:outline-none dark:border-white/10 dark:text-[#c4bbb0] dark:hover:bg-red-950/20 dark:hover:text-[#e6a49a] dark:focus-visible:bg-red-950/20"
                       >
-                        <MdLogout className="text-lg" />
-                        Logout
+                        <FiLogOut
+                          className="shrink-0 text-base"
+                          aria-hidden="true"
+                        />
+                        <span>Log out</span>
                       </button>
                     </>
                   ) : (
@@ -277,7 +284,7 @@ const Navbar = () => {
                           setIsAccountMenuOpen(false);
                           window.location.hash = "register";
                         }}
-                        className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 transition hover:bg-primary/10 hover:text-primary dark:text-gray-200"
+                        className="block w-full border-l-2 border-transparent px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.16em] text-[#514332] transition-colors hover:border-[#927650] hover:bg-[#f7f4ef] hover:text-[#765b3c] focus-visible:border-[#927650] focus-visible:outline-none dark:text-[#e8d8c3] dark:hover:bg-white/[0.04] dark:hover:text-[#e2c6a2]"
                       >
                         Register
                       </button>
@@ -287,7 +294,7 @@ const Navbar = () => {
                           setIsAccountMenuOpen(false);
                           window.location.hash = "login";
                         }}
-                        className="block w-full px-4 py-2 text-left text-sm font-medium text-gray-700 transition hover:bg-primary/10 hover:text-primary dark:text-gray-200"
+                        className="block w-full border-l-2 border-transparent px-5 py-3 text-left text-[10px] font-semibold uppercase tracking-[0.16em] text-[#514332] transition-colors hover:border-[#927650] hover:bg-[#f7f4ef] hover:text-[#765b3c] focus-visible:border-[#927650] focus-visible:outline-none dark:text-[#e8d8c3] dark:hover:bg-white/[0.04] dark:hover:text-[#e2c6a2]"
                       >
                         Login
                       </button>
